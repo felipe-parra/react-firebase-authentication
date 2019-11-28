@@ -4,21 +4,21 @@ import * as ROUTES from '../../constants/routes';
 
 const Navigation = () => {
 	return (
-		<div>
-			<ul>
-				<li>
+		<div className="container p-2">
+			<ul className="nav">
+				<li className="nav-item">
 					<Link to={ROUTES.SIGN_IN}>Sign in</Link>
 				</li>
-				<li>
+				<li className="nav-item">
 					<Link to={ROUTES.LANDING}>Landing</Link>
 				</li>
-				<li>
+				<li className="nav-item">
 					<Link to={ROUTES.HOME}>Home</Link>
 				</li>
-				<li>
+				<li className="nav-item">
 					<Link to={ROUTES.ACCOUNT}>Account</Link>
 				</li>
-				<li>
+				<li className="nav-item">
 					<Link to={ROUTES.ADMIN}>Admin</Link>
 				</li>
 			</ul>
