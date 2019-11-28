@@ -6,7 +6,7 @@ import * as ROUTES from '../../constants/routes';
 
 const SignUpPage = () => {
 	return (
-		<div>
+		<div className="container p-4">
 			<h1>SignUp</h1>
 			<SignUpForm />
 		</div>
@@ -49,23 +49,49 @@ class SignUpFormBase extends React.Component {
 		const isInvalid = passwordOne !== passwordTwo || passwordOne === '' || email === '' || username === '';
 		return (
 			<form onSubmit={this.onSubmit}>
-				<input name="username" value={username} onChange={this.onChange} type="text" placeholder="Full Name" />
-				<input name="email" value={email} onChange={this.onChange} type="email" placeholder="Email Address" />
-				<input
-					name="passwordOne"
-					value={passwordOne}
-					onChange={this.onChange}
-					type="password"
-					placeholder="Password"
-				/>
-				<input
-					name="passwordTwo"
-					value={passwordTwo}
-					onChange={this.onChange}
-					type="password"
-					placeholder="Confirm Password"
-				/>
-				<button type="submit" disabled={isInvalid}>
+				<div className="form-group">
+					<input
+						className="form-control"
+						name="username"
+						value={username}
+						onChange={this.onChange}
+						type="text"
+						placeholder="Full Name"
+					/>
+				</div>
+				<div className="form-group">
+					<input
+						className="form-control"
+						name="email"
+						value={email}
+						onChange={this.onChange}
+						type="email"
+						placeholder="Email Address"
+					/>
+				</div>
+				<div className="form-row">
+					<div className="form-group col-md-6">
+						<input
+							className="form-control"
+							name="passwordOne"
+							value={passwordOne}
+							onChange={this.onChange}
+							type="password"
+							placeholder="Password"
+						/>
+					</div>
+					<div className="form-group col-md-6">
+						<input
+							className="form-control"
+							name="passwordTwo"
+							value={passwordTwo}
+							onChange={this.onChange}
+							type="password"
+							placeholder="Confirm Password"
+						/>
+					</div>
+				</div>
+				<button className="btn btn-primary btn-block" type="submit" disabled={isInvalid}>
 					Sign Up
 				</button>
 				{error && <p>{error.message}</p>}
