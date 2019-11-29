@@ -11,8 +11,9 @@ const INITIAL_STATE = {
 class PasswordChangeForm extends React.Component {
 	state = { ...INITIAL_STATE };
 	onSubmit = (event) => {
+		event.preventDefault();
 		const { passwordOne } = this.state;
-		this.props.withFirebase
+		this.props.firebase
 			.doPasswordUpdate(passwordOne)
 			.then(() => {
 				this.setState({ ...INITIAL_STATE });
@@ -20,7 +21,6 @@ class PasswordChangeForm extends React.Component {
 			.catch((error) => {
 				this.setState({ error });
 			});
-		event.preventDefault();
 	};
 	onChange = (event) => {
 		this.setState({ [event.target.name]: event.target.value });
@@ -34,23 +34,21 @@ class PasswordChangeForm extends React.Component {
 					<div className="form-group col-md-6">
 						<input
 							className="form-control"
-							type="password"
 							name="passwordOne"
-							id="passwordOne"
-							placeholder="New Password"
-							onChange={this.onChange}
 							value={passwordOne}
+							onChange={this.onChange}
+							type="password"
+							placeholder="New Password"
 						/>
 					</div>
 					<div className="form-group col-md-6">
 						<input
 							className="form-control"
-							type="password"
 							name="passwordTwo"
-							id="passwordTwo"
-							placeholder="Confirm Password"
-							onChange={this.onChange}
 							value={passwordTwo}
+							onChange={this.onChange}
+							type="password"
+							placeholder="Confirm Password"
 						/>
 					</div>
 				</div>
