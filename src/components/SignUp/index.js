@@ -3,6 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
 
 const SignUpPage = () => {
 	return (
@@ -18,6 +19,7 @@ const INITIAL_STATE = {
 	email: '',
 	passwordOne: '',
 	passwordTwo: '',
+	isAdmin: false,
 	error: null
 };
 
@@ -27,12 +29,16 @@ class SignUpFormBase extends React.Component {
 		this.state = { ...INITIAL_STATE };
 	}
 	onSubmit = (event) => {
-		const { username, email, passwordOne } = this.state;
+		const { username, email, passwordOne, isAdmin } = this.state;
+		const roles = {};
+		if (isAdmin) {
+			roles[ROLES.ADMIN] = ROLES.ADMIN;
+		}
 		this.props.firebase
 			.doCreateUserWithEmailAndPassword(email, passwordOne)
 			.then((authUser) => {
 				// Create a user in your Firebase realtime database
-				return this.props.firebase.user(authUser.user.uid).set({ username, email });
+				return this.props.firebase.user(authUser.user.uid).set({ username, email, roles });
 			})
 			.then(() => {
 				this.setState({ ...INITIAL_STATE });
@@ -48,8 +54,12 @@ class SignUpFormBase extends React.Component {
 		this.setState({ [event.target.name]: event.target.value });
 	};
 
+	onChangeCheckbox = (event) => {
+		this.setState({ [event.target.name]: event.target.checked });
+	};
+
 	render() {
-		const { username, email, passwordOne, passwordTwo, error } = this.state;
+		const { username, email, passwordOne, passwordTwo, isAdmin, error } = this.state;
 		const isInvalid = passwordOne !== passwordTwo || passwordOne === '' || email === '' || username === '';
 		return (
 			<form onSubmit={this.onSubmit}>
@@ -93,6 +103,21 @@ class SignUpFormBase extends React.Component {
 							type="password"
 							placeholder="Confirm Password"
 						/>
+					</div>
+				</div>
+				<div className="form-group">
+					<div className="form-check">
+						<input
+							name="isAdmin"
+							type="checkbox"
+							checked={isAdmin}
+							onChange={this.onChangeCheckbox}
+							className="form-check-input bg-primary"
+							id="gridCheck"
+						/>
+						<label className="form-check-label text-primary" htmlFor="gridCheck">
+							is Admin?
+						</label>
 					</div>
 				</div>
 				<button className="btn btn-primary btn-block" type="submit" disabled={isInvalid}>
