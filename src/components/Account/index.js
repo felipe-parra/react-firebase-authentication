@@ -1,14 +1,22 @@
 import React from 'react';
 import { PasswordForgetForm } from '../PasswordForget';
 import PasswordChangeForm from '../PasswordChange';
+import { AuthUserContext, withAuthorization } from '../Session';
 
 const AccountPage = () => {
 	return (
-		<div>
-			<h4>Account Page</h4>
-			<PasswordForgetForm />
-			<PasswordChangeForm />
-		</div>
+		<AuthUserContext.Consumer>
+			{(authUser) => (
+				<div>
+					<h4>Account: {authUser.email}</h4>
+					<PasswordForgetForm />
+					<PasswordChangeForm />
+				</div>
+			)}
+		</AuthUserContext.Consumer>
 	);
 };
-export default AccountPage;
+
+const condition = (authUser) => !!authUser;
+
+export default withAuthorization(condition)(AccountPage);
