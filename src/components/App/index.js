@@ -15,8 +15,7 @@ import { withAuthentication } from '../Session';
 const App = () => (
 	<Router>
 		<Navigation />
-		<hr />
-		<div className="container">
+		<div className="container-fluid">
 			<Switch>
 				<Route exact path={ROUTES.LANDING} component={LandingPage} />
 				<Route path={ROUTES.SIGN_IN} component={SignInPage} />
