@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Switch, Route, Link } from 'react-router-dom';
 import { compose } from 'recompose';
 import { withAuthorization } from '../Session';
 import { withFirebase } from '../Firebase';
 
 import * as ROLES from '../../constants/roles';
+import * as ROUTES from '../../constants/routes';
 
 class AdminPage extends React.Component {
 	state = {
@@ -36,34 +38,145 @@ class AdminPage extends React.Component {
 			<div className="container-fluid p-3">
 				<h3>Admin</h3>
 				<p>The Admin Page is accessible by every signed in admin user.</p>
-				{loading && <div>Loading ...</div>}
-				<UserList users={users} />
+
+				<Switch>
+					<Route exact path={ROUTES.ADMIN_DETAILS} component={UserItem} />
+					<Route exact path={ROUTES.ADMIN} component={UserList} />
+				</Switch>
 			</div>
 		);
 	}
 }
 
-const UserList = ({ users }) => (
-	<table className="table">
-		<thead>
-			<tr>
-				<th scope="col">ID</th>
-				<th scope="col">E-Mail</th>
-				<th scope="col">Username</th>
-			</tr>
-		</thead>
-		<tbody>
-			{users.map((user) => (
-				<tr key={user.uid}>
-					<th scope="row">{user.uid}</th>
-					<td>{user.email}</td>
-					<td>{user.username}</td>
-				</tr>
-			))}
-		</tbody>
-	</table>
-);
+class UserListBase extends Component {
+	state = {
+		loading: false,
+		users: []
+	};
+
+	componentDidMount() {
+		this.setState({ loading: true });
+		this.props.firebase.users().on('value', (snapshot) => {
+			const usersObject = snapshot.val();
+			const userList = Object.keys(usersObject).map((key) => ({
+				...usersObject[key],
+				uid: key
+			}));
+			this.setState({
+				users: userList,
+				loading: false
+			});
+		});
+	}
+
+	componentWillUnmountMount() {
+		this.props.firebase.users().off();
+	}
+	render() {
+		const { users, loading } = this.state;
+		return (
+			<div>
+				<h2>Users</h2>
+				{loading && <div>Loading ...</div>}
+				<table className="table">
+					<thead>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">E-Mail</th>
+							<th scope="col">Username</th>
+							<th scope="col">Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						{users.map((user) => (
+							<tr key={user.uid}>
+								<th scope="row">{user.uid}</th>
+								<td>{user.email}</td>
+								<td>{user.username}</td>
+								<td>
+									<Link
+										to={{
+											pathname: `${ROUTES.ADMIN}/${user.uid}`,
+											state: { user }
+										}}
+									>
+										Details
+									</Link>
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		);
+	}
+}
+class UserItemBase extends Component {
+	state = {
+		loading: false,
+		user: null,
+		...this.props.location.state
+	};
+
+	componentDidMount() {
+		if (this.state.user) {
+			return;
+		}
+		this.setState({ loading: true });
+		this.props.firebase.user(this.props.match.params.id).on('value', (snapshot) => {
+			this.setState({
+				user: snapshot.val(),
+				loading: false
+			});
+		});
+	}
+	componentWillUnmount() {
+		this.props.firebase.user(this.props.match.params.id).off();
+	}
+
+	onSendPasswordResetEmail = () => {
+		this.props.firebase.doPasswordReset(this.state.user.email);
+	};
+
+	render() {
+		const { user, loading } = this.state;
+		return (
+			<div>
+				<h2>User ({this.props.match.params.id})</h2>
+				{loading && <div>Loading ...</div>}
+
+				{user && (
+					<div>
+						<span>
+							<strong>ID: </strong>
+							{user.uid}
+						</span>
+						<span>
+							<strong>Email: </strong>
+							{user.email}
+						</span>
+						<span>
+							<strong>Username: </strong>
+							{user.username}
+						</span>
+						<span>
+							<button
+								type="button"
+								className="btn btn-primary btn-md"
+								onClick={this.onSendPasswordResetEmail}
+							>
+								Send Password Reset
+							</button>
+						</span>
+					</div>
+				)}
+			</div>
+		);
+	}
+}
 
 const condition = (authUser) => authUser && !!authUser.roles[ROLES.ADMIN];
+const UserList = withFirebase(UserListBase);
+const UserItem = withFirebase(UserItemBase);
 
 export default compose(withAuthorization(condition), withFirebase)(AdminPage);
