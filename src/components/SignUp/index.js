@@ -116,7 +116,7 @@ class SignUpFormBase extends React.Component {
 							id="gridCheck"
 						/>
 						<label className="form-check-label text-primary" htmlFor="gridCheck">
-							is Admin?
+							ADMIN
 						</label>
 					</div>
 				</div>
