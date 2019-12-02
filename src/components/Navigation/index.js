@@ -4,6 +4,7 @@ import SignOutButton from '../SignOut';
 import { AuthUserContext } from '../Session';
 
 import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
 
 const Navigation = () => {
 	return (
@@ -12,13 +13,13 @@ const Navigation = () => {
 				<span className="navbar-toggler-icon" />
 			</button>
 			<AuthUserContext.Consumer>
-				{(authUser) => (authUser ? <NavigationAuth /> : <NavigationNonAuth />)}
+				{(authUser) => (authUser ? <NavigationAuth authUser={authUser} /> : <NavigationNonAuth />)}
 			</AuthUserContext.Consumer>
 		</div>
 	);
 };
 
-const NavigationAuth = () => (
+const NavigationAuth = ({ authUser }) => (
 	<div className="collapse navbar-collapse">
 		<ul className="navbar-nav">
 			<li className="nav-item">
@@ -31,14 +32,14 @@ const NavigationAuth = () => (
 					Account
 				</Link>
 			</li>
-			<li className="nav-item">
-				<Link to={ROUTES.ADMIN} className="nav-link">
-					Admin
-				</Link>
-			</li>
 
-			{/* <li className="">
-			</li> */}
+			{!!authUser.roles[ROLES.ADMIN] && (
+				<li className="nav-item">
+					<Link to={ROUTES.ADMIN} className="nav-link">
+						Admin
+					</Link>
+				</li>
+			)}
 		</ul>
 		<SignOutButton className="mr-auto" />
 	</div>
